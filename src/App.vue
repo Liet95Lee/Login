@@ -2,24 +2,26 @@
   <div id="app">
     <div class="layui-container">
     <form class="layui-form layui-form-pane" action="">
-      <div class="layui-form-item">
+      <div class="layui-form-item" :class="{ 'form-group--error': $v.name.$error }">
         <label class="layui-form-label">用户名</label>
-        <div class="layui-input-block">
-          <input type="text" name="title" v-model="name" required lay-verify="required" placeholder="请输入标题" autocomplete="off"
+        <div class="layui-input-inline">
+          <input type="text" name="title" v-model.trim="$v.name.$model" @input="setName($event.target.value)" placeholder="请输入标题" autocomplete="off"
             class="layui-input">
         </div>
+        <div class="error layui-form-mid" v-if="!$v.name.required">用户名不得为空</div>
+        <div class="error layui-form-mid" v-if="!$v.name.email">用户名输入格式错误</div>
       </div>
       <div class="layui-form-item">
         <label class="layui-form-label">密码</label>
         <div class="layui-input-block">
-          <input type="password" name="title" v-model="password" required lay-verify="required" placeholder="请输入标题" autocomplete="off"
+          <input type="password" name="title" v-model="password" placeholder="请输入标题" autocomplete="off"
             class="layui-input">
         </div>
       </div>
       <div class="layui-form-item">
         <label class="layui-form-label">验证码</label>
         <div class="layui-input-inline">
-          <input type="text" name="title" v-model="code" required lay-verify="required" placeholder="请输入标题" autocomplete="off"
+          <input type="text" name="title" v-model="code" placeholder="请输入标题" autocomplete="off"
             class="layui-input">
         </div>
         <div class="layui-form-mid svg" @click="getCaptcha()" v-html="svg"></div>
@@ -32,6 +34,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { required, email } from 'vuelidate/lib/validators'
 export default {
   name: 'app',
   data () {
@@ -43,10 +46,26 @@ export default {
       errorMsg: []
     }
   },
+  validations: {
+    name: {
+      required,
+      email
+    },
+    password: {
+      required
+    },
+    code: {
+      required
+    }
+  },
   mounted () {
     this.getCaptcha()
   },
   methods: {
+    setName (value) {
+      this.name = value
+      this.$v.name.$touch()
+    },
     getCaptcha () {
       axios.get('http://localhost:3000/getCaptcha').then((res) => {
         if (res.status === 200) {
@@ -94,5 +113,15 @@ input {
 .svg {
   position: relative;
   top: -15px;
+}
+
+.error {
+  display: none;
+}
+
+.form-group--error {
+  .error {
+    display: block;
+  }
 }
 </style>

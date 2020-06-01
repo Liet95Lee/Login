@@ -12,6 +12,7 @@ const dictionary = {
       email: '邮件',
       password: '密码',
       name: '账号',
+      username: '用户名',
       code: '验证码'
     }
   }
